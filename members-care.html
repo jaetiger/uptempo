@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Member's Care</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- 로그인 섹션 -->
+    <div id="login-section">
+        <button id="login-btn">Login with Google</button>
+    </div>
+
+    <!-- 목표 설정 및 기록 섹션 (로그인 후 표시) -->
+    <div id="member-care" style="display:none;">
+        <h1>Welcome, <span id="user-name"></span></h1>
+
+        <!-- 목표 설정 폼 -->
+        <form id="goal-form">
+            <label for="calories">Daily Calorie Goal:</label>
+            <input type="number" id="calories" name="calories"><br>
+
+            <label for="protein">Daily Protein Goal (g):</label>
+            <input type="number" id="protein" name="protein"><br>
+
+            <label for="weight">Current Weight (kg):</label>
+            <input type="number" id="weight" name="weight"><br>
+
+            <button type="submit">Save Goals</button>
+        </form>
+
+        <!-- 그래프를 표시할 영역 -->
+        <div id="chart-container">
+            <canvas id="progress-chart"></canvas>
+        </div>
+    </div>
+
+    <!-- Firebase 설정 및 Chart.js -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="members-care.js"></script> <!-- members-care.js 로직 -->
+
+    <!-- 그래프를 표시할 영역 -->
+    <div id="chart-container">
+        <canvas id="progress-chart"></canvas> <!-- 차트가 그려질 곳 -->
+    </div>
+
+</body>
+</html>
