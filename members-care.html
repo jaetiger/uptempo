@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Member's Care</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- 로그인 섹션 -->
+    <div id="login-section">
+        <button id="login-btn">Login with Google</button>
+    </div>
+
+    <!-- 목표 설정 및 기록 섹션 (로그인 후 표시) -->
+    <div id="member-care" style="display:none;">
+        <h1>Welcome, <span id="user-name"></span></h1>
+
+        <!-- 목표 설정 폼 -->
+        <form id="goal-form">
+            <label for="calories">Daily Calorie Goal:</label>
+            <input type="number" id="calories" name="calories"><br>
+
+            <label for="protein">Daily Protein Goal (g):</label>
+            <input type="number" id="protein" name="protein"><br>
+
+            <label for="weight">Current Weight (kg):</label>
+            <input type="number" id="weight" name="weight"><br>
+
+            <button type="submit">Save Goals</button>
+        </form>
+
+        <!-- 그래프를 표시할 영역 -->
+        <div id="chart-container">
+            <canvas id="progress-chart"></canvas>
+        </div>
+    </div>
+
+    <!-- Firebase App (firebaseConfig 초기화) -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+      // Firebase 설정
+      const firebaseConfig = {
+        apiKey: "AIzaSyA720paBCj0pn7cPrCtxCdO3S0g53aIk9w",
+        authDomain: "uptempo-aa8e4.firebaseapp.com",
+        projectId: "uptempo-aa8e4",
+        storageBucket: "uptempo-aa8e4.appspot.com",
+        messagingSenderId: "1051037240742",
+        appId: "1:1051037240742:web:5b41d6a8c524ff96229367",
+        measurementId: "G-CHGCN9JJX2"
+      };
+
+      // Firebase 초기화
+      firebase.initializeApp(firebaseConfig);
+      const auth = firebase.auth();
+      const db = firebase.firestore();
+
+      // Google 로그인 처리
+      const provider = new firebase.auth.GoogleAuthProvider();
+      document.getElementById('login-btn').addEventListener('click', () => {
+        auth.signInWithPopup(provider)
+          .then((result) => {
+            const user = result.user;
+            document.getElementById('login-section').style.display = 'none';
+            document.getElementById('member-care').style.display = 'block';
+            document.getElementById('user-name').textContent = user.displayName;
+
+            // 사용자 목표 불러오기
+            loadUserGoals(user.uid);
+
+            // 사용자 누적 기록 불러와 차트 그리기
+            loadProgress(user.uid);
+          })
+          .catch((error) => {
+            console.error("로그인 실패:", error);
+          });
+      });
+
+      // 사용자 목표 불러오기 함수
+      function loadUserGoals(uid) {
+        const userDoc = db.collection("goals").doc(uid);
+        userDoc.get().then((doc) => {
+          if (doc.exists) {
+            const data = doc.data();
+            document.getElementById('calories').value = data.calories || '';
+            document.getElementById('protein').value = data.protein || '';
+            document.getElementById('weight').value = data.weight || '';
+          } else {
+            console.log("사용자 목표가 설정되지 않았습니다.");
+          }
+        });
+      }
+
+      // 사용자 목표 저장
+      document.getElementById('goal-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const user = auth.currentUser;
+        const goals = {
+          calories: document.getElementById('calories').value,
+          protein: document.getElementById('protein').value,
+          weight: document.getElementById('weight').value,
+        };
+
+        db.collection("goals").doc(user.uid).set(goals)
+          .then(() => {
+            alert('목표가 성공적으로 저장되었습니다!');
+          })
+          .catch((error) => {
+            console.error("목표 저장 실패:", error);
+          });
+      });
+
+      // Firestore에서 사용자 기록 불러오기 및 차트 그리기
+      function loadProgress(uid) {
+        const progressCollection = db.collection("progress").where("userId", "==", uid);
+
+        progressCollection.get().then((snapshot) => {
+          const dates = [];
+          const calories = [];
+          const protein = [];
+          const weight = [];
+
+          snapshot.forEach((doc) => {
+            const data = doc.data();
+            dates.push(data.date);
+            calories.push(data.calories);
+            protein.push(data.protein);
+            weight.push(data.weight);
+          });
+
+          drawChart(dates, calories, protein, weight);
+        });
+      }
+
+      // 차트를 그리는 함수
+      function drawChart(dates, calories, protein, weight) {
+        const ctx = document.getElementById('progress-chart').getContext('2d');
+        new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: dates,
+            datasets: [
+              { label: 'Calories', data: calories, borderColor: 'red', fill: false },
+              { label: 'Protein (g)', data: protein, borderColor: 'blue', fill: false },
+              { label: 'Weight (kg)', data: weight, borderColor: 'green', fill: false }
+            ]
+          },
+          options: {
+            responsive: true,
+            scales: {
+              x: { title: { display: true, text: 'Date' }},
+              y: { title: { display: true, text: 'Values' }}
+            }
+          }
+        });
+      }
+    </script>
+</body>
+</html>
