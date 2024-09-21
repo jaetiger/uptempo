@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Member's Care</title>
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- 팝업을 위한 스타일 -->
+    <style>
+      /* 모달 팝업 스타일 */
+      .modal {
+        display: none;
+        position: fixed; 
+        z-index: 1; 
+        padding-top: 100px;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto; /* 스크롤이 필요한 경우 */
+        background-color: rgba(0, 0, 0, 0.5); /* 반투명 배경 */
+      }
+
+      .modal-content {
+        background-color: white;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 400px;
+        text-align: center;
+        position: relative;
+      }
+
+      .close {
+        color: #aaa;
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+      }
+
+      .close:hover,
+      .close:focus {
+        color: black;
+        text-decoration: none;
+      }
+
+      /* 로그인 버튼 스타일 (네비게이션 바) */
+      nav ul li button {
+        background-color: transparent;
+        border: none;
+        color: white;
+        font-size: 18px;
+        cursor: pointer;
+      }
+
+      nav ul li button:hover {
+        text-decoration: underline;
+      }
+    </style>
+</head>
+<body>
+    <!-- 네비게이션 바 -->
+    <nav>
+        <div class="logo">
+            <img src="UPTEMPOTEXT LOGO WHITE.png" alt="로고 이미지">
+        </div>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="about.html">About us</a></li>
+            <li><a href="camp.html">Camp</a></li>
+            <li><a href="members-care.html">Member's care</a></li>
+            <li><a href="online-courses.html">Online courses</a></li>
+            <li><a href="shop.html">Shop</a></li>
+            <!-- 로그인 버튼 추가 -->
+            <li><button id="open-login-popup">로그인</button></li>
+        </ul>
+    </nav>
+
+    <!-- 로그인 팝업 모달 -->
+    <div id="login-popup" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>로그인</h2>
+            <button id="login-btn">Google로 로그인</button>
+        </div>
+    </div>
+
+    <!-- 목표 설정 및 기록 섹션 (로그인 후 표시) -->
+    <div id="member-care" style="display:none;">
+        <h1>Welcome, <span id="user-name"></span></h1>
+
+        <!-- 목표 설정 폼 -->
+        <form id="goal-form">
+            <label for="calories">Daily Calorie Goal:</label>
+            <input type="number" id="calories" name="calories"><br>
+
+            <label for="protein">Daily Protein Goal (g):</label>
+            <input type="number" id="protein" name="protein"><br>
+
+            <label for="weight">Current Weight (kg):</label>
+            <input type="number" id="weight" name="weight"><br>
+
+            <button type="submit">Save Goals</button>
+        </form>
+
+        <!-- 그래프를 표시할 영역 -->
+        <div id="chart-container">
+            <canvas id="progress-chart"></canvas>
+        </div>
+    </div>
+
+    <!-- Firebase App (firebaseConfig 초기화) 및 기타 스크립트 -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="members-care.js"></script> <!-- JavaScript 로직 파일 -->
+</body>
+</html>
